@@ -2,13 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\LeagueRepository;
-use Doctrine\Common\Collections\ArrayCollection;
+use App\Repository\ChampionshipRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: LeagueRepository::class)]
-class League
+#[ORM\Entity(repositoryClass: ChampionshipRepository::class)]
+class Championship
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -18,22 +17,14 @@ class League
     #[ORM\Column(type: 'string', length: 255)]
     private $name;
 
+    #[ORM\ManyToOne(targetEntity: League::class, inversedBy: 'championships')]
+    private $league;
+
     #[ORM\Column(type: 'datetime_immutable')]
     private $created_at;
 
     #[ORM\Column(type: 'datetime_immutable')]
     private $updated_at;
-
-    #[ORM\Column(type: 'boolean', nullable: true)]
-    private $disabled;
-
-    #[ORM\OneToMany(mappedBy: 'league', targetEntity: Championship::class)]
-    private $championships;
-
-    public function __construct()
-    {
-        $this->championships = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -48,6 +39,18 @@ class League
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getLeague(): ?League
+    {
+        return $this->league;
+    }
+
+    public function setLeague(?League $league): self
+    {
+        $this->league = $league;
 
         return $this;
     }
@@ -102,39 +105,5 @@ class League
     public function getChampionships(): Collection
     {
         return $this->championships;
-    }
-
-    public function isDisabled(): ?bool
-    {
-        return $this->disabled;
-    }
-
-    public function setDisabled(?bool $disabled): self
-    {
-        $this->disabled = $disabled;
-
-        return $this;
-    }
-
-    public function addChampionship(Championship $championship): self
-    {
-        if (!$this->championships->contains($championship)) {
-            $this->championships[] = $championship;
-            $championship->setLeague($this);
-        }
-
-        return $this;
-    }
-
-    public function removeChampionship(Championship $championship): self
-    {
-        if ($this->championships->removeElement($championship)) {
-            // set the owning side to null (unless already changed)
-            if ($championship->getLeague() === $this) {
-                $championship->setLeague(null);
-            }
-        }
-
-        return $this;
     }
 }
