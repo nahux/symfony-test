@@ -1,9 +1,11 @@
 <?php
+
 namespace App\Controller\Api;
 
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @route("/api/user")
@@ -53,7 +55,10 @@ class UserController extends AbstractController
                 "name" => "Theo",
             ],
         ];
-        $user = $users[$id] ?? [];
-        return new JsonResponse($user, 200, []);
+        if (!isset($users[$id])) {
+            return new JsonResponse(null, 404);
+        }
+
+        return new JsonResponse($users[$id], 200, []);
     }
 }
