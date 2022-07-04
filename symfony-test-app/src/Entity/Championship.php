@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ChampionshipRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -23,8 +24,16 @@ class Championship
     #[ORM\Column(type: 'datetime_immutable')]
     private $created_at;
 
-    #[ORM\Column(type: 'datetime_immutable')]
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private $updated_at;
+
+    #[ORM\OneToMany(mappedBy: 'championship', targetEntity: Team::class)]
+    private $teams;
+
+    public function __construct()
+    {
+        $this->teams = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -105,5 +114,35 @@ class Championship
     public function getChampionships(): Collection
     {
         return $this->championships;
+    }
+
+    /**
+     * @return Collection<int, Team>
+     */
+    public function getTeams(): Collection
+    {
+        return $this->teams;
+    }
+
+    public function addTeam(Team $team): self
+    {
+        if (!$this->teams->contains($team)) {
+            $this->teams[] = $team;
+            $team->setChampionship($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTeam(Team $team): self
+    {
+        if ($this->teams->removeElement($team)) {
+            // set the owning side to null (unless already changed)
+            if ($team->getChampionship() === $this) {
+                $team->setChampionship(null);
+            }
+        }
+
+        return $this;
     }
 }

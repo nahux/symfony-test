@@ -21,7 +21,7 @@ class League
     #[ORM\Column(type: 'datetime_immutable')]
     private $created_at;
 
-    #[ORM\Column(type: 'datetime_immutable')]
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
     private $updated_at;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
@@ -78,9 +78,8 @@ class League
 
     /**
      * Gets triggered only on insert
-
-     * @ORM\PrePersist
      */
+    #[ORM\PrePersist]
     public function onPrePersist()
     {
         $this->created_at = new \DateTime("now");
@@ -88,9 +87,8 @@ class League
 
     /**
      * Gets triggered every time on update
-
-     * @ORM\PreUpdate
      */
+    #[ORM\PreUpdate]
     public function onPreUpdate()
     {
         $this->updated_at = new \DateTime("now");
